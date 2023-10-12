@@ -4,10 +4,10 @@ const style = `
     border-radius: 20px;
 `;
 
-const emailTemplate = (email, content, replyTo, subject) => {
+const emailTemplate = (receiver, content, sender, subject) => {
   return {
-    Source: '"Skyward" <' + replyTo + ">",
-    Destination: { ToAddresses: [email] },
+    Source: '"Skyward" <' + sender + ">",
+    Destination: { ToAddresses: [receiver] },
     Message: {
       Body: {
         Html: {
