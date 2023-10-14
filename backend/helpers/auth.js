@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import asyncHandler from "../middlewares/asyncHandler.js";
 
 export const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
