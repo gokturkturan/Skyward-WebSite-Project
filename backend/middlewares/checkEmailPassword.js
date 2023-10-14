@@ -1,24 +1,33 @@
 import validator from "email-validator";
 
-const isEmailPasswordValid = (req, res, next) => {
-  const { email, password } = req.body;
+const isEmailValid = (req, res, next) => {
+  const { email } = req.body;
 
-  if (!validator.validate(email)) {
-    res.status(400);
-    throw new Error("This email is not valid.");
+  if (!email) {
+    return res.status(400).json({ error: "Email is required." });
   }
 
-  if (!password) {
-    res.status(400);
-    throw new Error("Password is required.");
-  }
-
-  if (password && password.length < 6) {
-    res.status(400);
-    throw new Error("Password should be at least 6 characters.");
+  if (email && !validator.validate(email)) {
+    return res.status(400).json({ error: "This email is not valid." });
   }
 
   next();
 };
 
-export default isEmailPasswordValid;
+const isPasswordValid = (req, res, next) => {
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ error: "Password is required." });
+  }
+
+  if (password && password.length < 6) {
+    return res
+      .status(400)
+      .json({ error: "Password should be at least 6 characters." });
+  }
+
+  next();
+};
+
+export { isEmailValid, isPasswordValid };

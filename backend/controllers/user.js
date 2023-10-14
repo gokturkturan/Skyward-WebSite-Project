@@ -17,7 +17,7 @@ const tokenAndUserResponse = (req, res, user) => {
   user.password = undefined;
   user.resetCode = undefined;
 
-  res.status(200).json({
+  return res.status(200).json({
     token,
     refreshToken,
     user,
@@ -30,8 +30,7 @@ const preRegister = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (user) {
-      res.status(400);
-      throw new Error("This email is already in use.");
+      return res.status(404).json({ error: "This email is already in use." });
     }
 
     const token = jwt.sign({ email, password }, process.env.JWT_SECRET, {
@@ -57,17 +56,15 @@ const preRegister = async (req, res) => {
       ),
       (err, data) => {
         if (err) {
-          res.status(400);
           console.log(err);
-          throw new Error("Mail sending failed.");
+          return res.status(404).json({ error: "Mail sending failed." });
         } else {
-          res.status(200).json({ message: "Mail sending successful." });
+          return res.status(200).json({ message: "Mail sending successful." });
         }
       }
     );
   } catch (error) {
-    res.status(500);
-    throw new Error("Something went wrong. Try again.");
+    return res.status(500).json({ error: "Something went wrong. Try again." });
   }
 };
 
@@ -80,8 +77,7 @@ const register = async (req, res) => {
 
     const isUserExists = await User.findOne({ email });
     if (isUserExists) {
-      res.status(400);
-      throw new Error("This email is already in use.");
+      return res.status(400).json({ error: "This email is already in use." });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -94,8 +90,7 @@ const register = async (req, res) => {
 
     tokenAndUserResponse(req, res, user);
   } catch (error) {
-    res.status(500);
-    throw new Error("Something went wrong. Try again.");
+    return res.status(400).json({ error: "Something went wrong. Try again." });
   }
 };
 
@@ -105,20 +100,17 @@ const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      res.status(404);
-      throw new Error("User not found.");
+      return res.status(404).json({ error: "User not found." });
     }
 
     const isPasswordCorrect = await comparePasswords(password, user.password);
     if (!isPasswordCorrect) {
-      res.status(400);
-      throw new Error("Password is wrong.");
+      return res.status(400).json({ error: "Password is wrong." });
     }
 
     tokenAndUserResponse(req, res, user);
   } catch (error) {
-    res.status(500);
-    throw new Error("Something went wrong. Try again.");
+    return res.status(500).json({ error: "Something went wrong. Try again." });
   }
 };
 
@@ -128,8 +120,9 @@ const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      res.status(404);
-      throw new Error("No registered users were found with this email.");
+      return res
+        .status(500)
+        .json({ error: "No registered users were found with this email." });
     }
 
     const resetCode = nanoid();
@@ -159,17 +152,14 @@ const forgotPassword = async (req, res) => {
       ),
       (err, data) => {
         if (err) {
-          res.status(400);
-          console.log(err);
-          throw new Error("Mail sending failed.");
+          return res.status(400).json({ error: "Mail sending failed." });
         } else {
-          res.status(200).json({ message: "Mail sending successful." });
+          return res.status(200).json({ error: "Mail sending successful." });
         }
       }
     );
   } catch (error) {
-    res.status(500);
-    throw new Error("Something went wrong. Try again.");
+    return res.status(500).json({ error: "Something went wrong. Try again." });
   }
 };
 
@@ -182,37 +172,88 @@ const accessAccount = async (req, res) => {
 
     tokenAndUserResponse(req, res, user);
   } catch (error) {
-    res.status(500);
-    throw new Error("Something went wrong. Try again.");
+    return res.status(500).json({ error: "Something went wrong. Try again." });
   }
 };
 
 const refreshToken = async (req, res) => {
   try {
-    const { userId } = jwt.verify(
-      req.headers.refreshtoken,
-      process.env.JWT_SECRET
-    );
+    const { userId } = jwt.verify(req.headers.refresh, process.env.JWT_SECRET);
 
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(userId);
 
     tokenAndUserResponse(req, res, user);
   } catch (error) {
-    res.status(500);
-    throw new Error("Something went wrong. Try again.");
+    return res.status(403).json({ error: "Refresh token failed." });
   }
 };
 
 const currentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select(
-      "-password -resetCode"
+    const user = await User.findById(req.user.userId);
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
+const updatePassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    user.password = await hashPassword(password);
+    await user.save();
+    return res.status(200).json({ message: "Password is updated." });
+  } catch (error) {
+    return res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.userId,
+      req.body,
+      {
+        new: true,
+      }
     );
 
-    res.status(200).json(user);
+    updatedUser.password = undefined;
+    updatedUser.resetCode = undefined;
+
+    return res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500);
-    throw new Error("Something went wrong. Try again.");
+    if (error.codeName === "DuplicateKey") {
+      return res
+        .status(400)
+        .json({ error: "The username or email is already used." });
+    } else {
+      return res
+        .status(500)
+        .json({ error: "Something went wrong. Try again." });
+    }
   }
 };
 
@@ -224,6 +265,9 @@ const userController = {
   accessAccount,
   refreshToken,
   currentUser,
+  getProfile,
+  updatePassword,
+  updateProfile,
 };
 
 export default userController;
