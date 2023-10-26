@@ -5,6 +5,15 @@ import User from "../models/user.js";
 import { nanoid } from "nanoid";
 import { comparePasswords, hashPassword } from "../helpers/auth.js";
 
+const awsConfig = {
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_ID,
+  region: "eu-north-1",
+  apiVersion: "2010-12-01",
+};
+
+const awsSes = new SES(awsConfig);
+
 const tokenAndUserResponse = (req, res, user) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
@@ -37,20 +46,11 @@ const preRegister = async (req, res) => {
       expiresIn: "1h",
     });
 
-    const awsConfig = {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_ID,
-      region: "eu-north-1",
-      apiVersion: "2010-12-01",
-    };
-
-    const awsSes = new SES(awsConfig);
-
     awsSes.sendEmail(
       emailTemplate(
         email,
         `<p>Please click the link below to activate your account.</p>
-    <a href="${process.env.CLIENT_URL}/users/account-activate/${token}"}>Activate my account</a>`,
+    <a href="${process.env.CLIENT_URL}/account-activate/${token}"}>Activate my account</a>`,
         process.env.EMAIL_FROM,
         `Activate Your Account`
       ),
@@ -121,7 +121,7 @@ const forgotPassword = async (req, res) => {
 
     if (!user) {
       return res
-        .status(500)
+        .status(404)
         .json({ error: "No registered users were found with this email." });
     }
 
@@ -133,20 +133,11 @@ const forgotPassword = async (req, res) => {
       expiresIn: "1h",
     });
 
-    const awsConfig = {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_ID,
-      region: "eu-north-1",
-      apiVersion: "2010-12-01",
-    };
-
-    const awsSes = new SES(awsConfig);
-
     awsSes.sendEmail(
       emailTemplate(
         email,
         `<p>Please click the link below to access your account.</p>
-      <a href="${process.env.CLIENT_URL}/users/access-account/${resetToken}"}>Access my account</a>`,
+      <a href="${process.env.CLIENT_URL}/account-access/${resetToken}"}>Access my account</a>`,
         process.env.EMAIL_FROM,
         `Access Your Account`
       ),
@@ -154,7 +145,7 @@ const forgotPassword = async (req, res) => {
         if (err) {
           return res.status(400).json({ error: "Mail sending failed." });
         } else {
-          return res.status(200).json({ error: "Mail sending successful." });
+          return res.status(200).json({ message: "Mail sending successful." });
         }
       }
     );
@@ -167,10 +158,15 @@ const accessAccount = async (req, res) => {
   try {
     const { resetToken } = req.body;
     const { resetCode } = jwt.verify(resetToken, process.env.JWT_SECRET);
-
-    const user = await User.findOneAndUpdate({ resetCode }, { resetCode: "" });
-
-    tokenAndUserResponse(req, res, user);
+    const user = await User.findOne({ resetCode });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: "No registered users were found with this email." });
+    }
+    user.resetCode = "";
+    const updatedUser = await user.save();
+    tokenAndUserResponse(req, res, updatedUser);
   } catch (error) {
     return res.status(500).json({ error: "Something went wrong. Try again." });
   }

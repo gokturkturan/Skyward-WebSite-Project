@@ -15,7 +15,7 @@ const isEmailValid = (req, res, next) => {
 };
 
 const isPasswordValid = (req, res, next) => {
-  const { password } = req.body;
+  const { password, confirmPassword } = req.body;
 
   if (!password) {
     return res.status(400).json({ error: "Password is required." });
@@ -25,6 +25,10 @@ const isPasswordValid = (req, res, next) => {
     return res
       .status(400)
       .json({ error: "Password should be at least 6 characters." });
+  }
+
+  if (confirmPassword && password && confirmPassword !== password) {
+    return res.status(400).json({ error: "Passwords are not the same." });
   }
 
   next();

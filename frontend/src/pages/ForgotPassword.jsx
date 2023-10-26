@@ -5,10 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const Register = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -17,10 +15,8 @@ const Register = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { data } = await axios.post(`/users/pre-register`, {
+      const { data } = await axios.post(`/users/forgot-password`, {
         email,
-        password,
-        confirmPassword,
       });
       toast.success(data.message);
       setIsLoading(false);
@@ -35,7 +31,7 @@ const Register = () => {
     <Container>
       <Row className="justify-content-md-center">
         <Col className="border rounded-4 mt-5" xs={15} md={8} sm={10} lg={4}>
-          <h1>Sign Up</h1>
+          <h1>Forgot Password</h1>
           <Form onSubmit={submitHandler}>
             <Form.Group id="email" className="my-2" controlId="email">
               <Form.Label>E-Mail</Form.Label>
@@ -50,46 +46,18 @@ const Register = () => {
                 }}
               />
             </Form.Group>
-            <Form.Group id="password" className="my-2" controlId="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Enter your password"
-                required
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
-              />
-            </Form.Group>
-            <Form.Group
-              id="confirmPassword"
-              className="my-2"
-              controlId="confirmPassword"
-            >
-              <Form.Label>Confirm Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Enter your password again"
-                required
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                }}
-              />
-            </Form.Group>
             <Button
               type="submit"
               variant="primary"
               className="mt-2"
               disabled={isLoading}
             >
-              {isLoading ? "Loading..." : "Sign Up"}
+              {isLoading ? "Loading..." : "Submit"}
             </Button>
           </Form>
           <Row className="py-3">
             <Col>
-              Already have an account? <Link to="/login">Sign In!</Link>
+              <Link to="/login">Return to login page</Link>
             </Col>
           </Row>
         </Col>
@@ -98,4 +66,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;
