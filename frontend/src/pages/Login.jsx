@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/auth";
@@ -14,6 +14,16 @@ const Login = () => {
   const [auth, setAuth] = useAuth();
 
   const navigate = useNavigate();
+
+  const { search } = useLocation();
+  const searchParams = new URLSearchParams(search);
+  const redirect = searchParams.get("redirect") || "/";
+
+  useEffect(() => {
+    if (auth?.isLoggedin) {
+      navigate(redirect);
+    }
+  }, [auth, navigate]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -30,7 +40,7 @@ const Login = () => {
       );
       toast.success("You have successfully logged in");
       setIsLoading(false);
-      navigate("/");
+      navigate(redirect);
     } catch (error) {
       toast.error(error.response.data.error);
       setIsLoading(false);

@@ -17,6 +17,10 @@ const Header = () => {
     navigate("/login");
   };
 
+  const handlePostAdClick = () => {
+    navigate(`/login?redirect=/ad/create`);
+  };
+
   return (
     <header>
       <Navbar bg="light" variant="light" expand="md" collapseOnSelect>
@@ -29,6 +33,9 @@ const Header = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav"></Navbar.Toggle>
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
+              <Nav.Link onClick={handlePostAdClick}>
+                <span style={{ marginLeft: "5px" }}>Post Ad</span>
+              </Nav.Link>
               {!auth.isLoggedin && (
                 <LinkContainer to="/login">
                   <Nav.Link>

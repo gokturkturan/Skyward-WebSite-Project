@@ -17,6 +17,9 @@ import { AuthProvider } from "./context/auth";
 import AccountActivate from "./pages/auth/AccountActivate";
 import ForgotPassword from "./pages/ForgotPassword";
 import AccountAccess from "./pages/auth/AccountAccess";
+import Dashboard from "./pages/user/Dashboard";
+import AdCreate from "./pages/user/ad/AdCreate";
+import PrivateRoute from "./components/routes/PrivateRoute";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,6 +36,11 @@ const router = createBrowserRouter(
         path="/account-access/:resetToken"
         element={<AccountAccess />}
       ></Route>
+
+      <Route path="" element={<PrivateRoute />}>
+        <Route path="/dashboard" element={<Dashboard />}></Route>
+        <Route path="/ad/create" element={<AdCreate />}></Route>
+      </Route>
     </Route>
   )
 );

@@ -39,7 +39,7 @@ const preRegister = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(404).json({ error: "This email is already in use." });
+      return res.status(400).json({ error: "This email is already in use." });
     }
 
     const token = jwt.sign({ email, password }, process.env.JWT_SECRET, {
@@ -57,7 +57,7 @@ const preRegister = async (req, res) => {
       (err, data) => {
         if (err) {
           console.log(err);
-          return res.status(404).json({ error: "Mail sending failed." });
+          return res.status(400).json({ error: "Mail sending failed." });
         } else {
           return res.status(200).json({ message: "Mail sending successful." });
         }
@@ -90,7 +90,7 @@ const register = async (req, res) => {
 
     tokenAndUserResponse(req, res, user);
   } catch (error) {
-    return res.status(400).json({ error: "Something went wrong. Try again." });
+    return res.status(500).json({ error: "Something went wrong. Try again." });
   }
 };
 
@@ -179,15 +179,15 @@ const refreshToken = async (req, res) => {
     const user = await User.findById(userId);
 
     tokenAndUserResponse(req, res, user);
-  } catch (error) {
-    return res.status(403).json({ error: "Refresh token failed." });
+  } catch (err) {
+    console.log(err);
+    return res.status(403).json({ error: "Refresh token failed" });
   }
 };
 
 const currentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
-
     return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ error: "Something went wrong. Try again." });

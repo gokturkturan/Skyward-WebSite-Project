@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/auth";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +13,14 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const [auth, setAuth] = useAuth();
+
+  useEffect(() => {
+    if (auth?.isLoggedin) {
+      navigate("/");
+    }
+  }, [auth, navigate]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
