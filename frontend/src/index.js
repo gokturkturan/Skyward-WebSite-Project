@@ -6,8 +6,7 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
-import "./assets/styles/index.css";
-import "./assets/styles/bootstrap.custom.css";
+import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Home from "./pages/Home";
@@ -18,8 +17,9 @@ import AccountActivate from "./pages/auth/AccountActivate";
 import ForgotPassword from "./pages/ForgotPassword";
 import AccountAccess from "./pages/auth/AccountAccess";
 import Dashboard from "./pages/user/Dashboard";
-import AdCreate from "./pages/user/ad/AdCreate";
 import PrivateRoute from "./components/routes/PrivateRoute";
+import Sell from "./pages/user/ad/Sell";
+import Rent from "./pages/user/ad/Rent";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,7 +39,8 @@ const router = createBrowserRouter(
 
       <Route path="" element={<PrivateRoute />}>
         <Route path="/dashboard" element={<Dashboard />}></Route>
-        <Route path="/ad/create" element={<AdCreate />}></Route>
+        <Route path="/ad/create/sell" element={<Sell />}></Route>
+        <Route path="/ad/create/rent" element={<Rent />}></Route>
       </Route>
     </Route>
   )

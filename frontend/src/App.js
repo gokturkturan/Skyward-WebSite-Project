@@ -1,5 +1,4 @@
 import React from "react";
-import { Container } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
 import { Toaster } from "react-hot-toast";
@@ -11,9 +10,9 @@ const App = () => {
       <Header />
       <Toaster />
       <main className="py-3">
-        <Container>
+        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <Outlet />
-        </Container>
+        </div>
       </main>
       <Footer />
     </>
