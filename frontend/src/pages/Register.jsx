@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import logo from "../assets/skyward.png";
 import { useAuth } from "../context/auth";
 
 const Register = () => {
@@ -43,11 +42,6 @@ const Register = () => {
       <div className="flex min-h-full flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-sm space-y-10">
           <div>
-            <img
-              className="mx-auto h-10 w-auto"
-              src={logo}
-              alt="Your Company"
-            />
             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
               Sign up for Skyward
             </h2>

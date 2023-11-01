@@ -4,7 +4,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/auth";
-import logo from "../assets/skyward.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -52,11 +51,6 @@ const Login = () => {
       <div className="flex min-h-full flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-sm space-y-10">
           <div>
-            <img
-              className="mx-auto h-10 w-auto"
-              src={logo}
-              alt="Your Company"
-            />
             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
               Sign in to your account
             </h2>
