@@ -13,6 +13,7 @@ node_modules
 
 # misc
 .DS_Store
+constants.js
 .env
 .env.local
 .env.development.local

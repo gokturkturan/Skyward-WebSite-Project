@@ -12,7 +12,7 @@ const port = process.env.PORT;
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "300kb" }));
 app.use(morgan("dev"));
 app.use(cors());
 

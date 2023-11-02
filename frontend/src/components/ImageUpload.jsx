@@ -11,7 +11,7 @@ const ImageUpload = ({ ad, setAd }) => {
       if (files?.length) {
         setAd({ ...ad, uploading: true });
         files.map((file) => {
-          if (file.size > 1048576) {
+          if (file.size > 307200) {
             toast.error(
               files.length > 1
                 ? "One of the photos is too large."
@@ -53,9 +53,19 @@ const ImageUpload = ({ ad, setAd }) => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (photo) => {
+    const answer = window.confirm("Do you want to delete this photo?");
+    if (!answer) return;
+    setAd({ ...ad, uploading: true });
     try {
-      setAd({ ...ad, uploading: true });
+      const { data } = await axios.post("/ads/delete-image", photo);
+      if (data) {
+        setAd((prev) => ({
+          ...prev,
+          photos: prev.photos.filter((p) => p.Key !== photo.Key),
+          uploading: false,
+        }));
+      }
     } catch (error) {
       console.log(error);
       setAd({ ...ad, uploading: false });
@@ -71,9 +81,9 @@ const ImageUpload = ({ ad, setAd }) => {
         >
           Photos
         </label>
-        <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+        <div className="flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
           <div className="text-center">
-            <div className="mt-4 flex text-sm leading-6 ">
+            <div className="flex text-sm leading-6">
               <div className="text-blue-600">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -94,7 +104,7 @@ const ImageUpload = ({ ad, setAd }) => {
                 htmlFor="file-upload"
                 className="relative cursor-pointer rounded-md bg-white font-semibold text-blue-600 hover:text-blue-500"
               >
-                <span>Upload photos</span>
+                {ad.uploading ? "Processing" : "Upload Photos"}
                 <input
                   id="file-upload"
                   accept="image/*"
@@ -107,8 +117,51 @@ const ImageUpload = ({ ad, setAd }) => {
               </label>
             </div>
             <p className="text-xs leading-5 text-gray-600">
-              PNG, JPG, GIF (Each photo must be at most 1 MB)
+              PNG, JPG, GIF (Each photo must be at most 300kB)
             </p>
+          </div>
+        </div>
+      </div>
+      <div className="py-16 sm:py-8 lg:mx-auto lg:max-w-7xl lg:px-8">
+        <div className="relative">
+          <div className="relative -mb-6 w-full overflow-x-auto pb-6">
+            <ul className="mx-4 inline-flex space-x-8 sm:mx-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-x-8 lg:space-x-0">
+              {ad.photos.map((photo) => (
+                <li
+                  key={photo.Key}
+                  className="inline-flex w-64 flex-col text-center lg:w-auto"
+                >
+                  <div className="group relative">
+                    <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md">
+                      <img
+                        src={photo.Location}
+                        alt="property"
+                        className="h-56 w-full object-cover object-center group-hover:opacity-75"
+                      />
+                    </div>
+                    <div
+                      className="py-2 flex justify-center"
+                      onClick={() => handleDelete(photo)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="red"
+                        class="w-6 h-6"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
