@@ -31,7 +31,11 @@ const userSchema = mongoose.Schema(
     company: { type: String, default: "" },
     phone: { type: String, default: "" },
     photo: {},
-    role: { type: [String], default: [], enum: ["Buyer", "Seller", "Admin"] },
+    role: {
+      type: String,
+      default: "Buyer",
+      enum: ["Buyer", "Seller", "Admin"],
+    },
     searchedProperties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ad" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ad" }],
     resetCode: { type: String, default: "" },

@@ -3,6 +3,9 @@ import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import CurrencyInput from "react-currency-input-field";
 import { GOOGLE_PLACES_KEY } from "../constants";
 import ImageUpload from "./ImageUpload";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const propertyType = [
   { id: "land", title: "Land" },
@@ -15,6 +18,7 @@ const carPark = [
 ];
 
 const AdForm = ({ action }) => {
+  const navigate = useNavigate();
   const [ad, setAd] = useState({
     photos: [],
     uploading: false,
@@ -30,7 +34,7 @@ const AdForm = ({ action }) => {
   const handleChangePropertyType = (type) => {
     if (type.id === "land") {
       delete ad.bathroom;
-      delete ad.bedrooms;
+      delete ad.bedroom;
       delete ad.carPark;
     } else {
       delete ad.landSize;
@@ -38,9 +42,28 @@ const AdForm = ({ action }) => {
     setAd({ ...ad, propertyType: type.id });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setAd({ ...ad, loading: true });
+      const { data } = await axios.post("/ads/create-ad", ad);
+      if (data?.error) {
+        toast.error(data.error);
+        setAd({ ...ad, loading: false });
+      } else {
+        toast.success("Ad created successfully");
+        setAd({ ...ad, loading: false });
+        // navigate("/dashboard");
+      }
+    } catch (error) {
+      console.log(error);
+      setAd({ ...ad, loading: false });
+    }
+  };
+
   return (
     <>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="mt-2">
           <label
             htmlFor="title"
@@ -73,6 +96,7 @@ const AdForm = ({ action }) => {
             apiOptions="tr"
             selectProps={{
               defaultInputValue: ad?.address,
+              required: true,
               placeholder: "Search for address...",
               onChange: ({ value }) => {
                 setAd({ ...ad, address: value.description });
@@ -96,6 +120,7 @@ const AdForm = ({ action }) => {
                     defaultChecked={type.id === "email"}
                     className="h-4 w-4"
                     onChange={() => handleChangePropertyType(type)}
+                    required
                   />
                   <label
                     htmlFor={type.id}
@@ -123,6 +148,7 @@ const AdForm = ({ action }) => {
             <CurrencyInput
               placeholder="Enter a price"
               defaultValue={ad.price}
+              required
               className="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               onValueChange={(value) => setAd({ ...ad, price: value })}
             />
@@ -148,9 +174,9 @@ const AdForm = ({ action }) => {
               id="bedroom"
               min="0"
               className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-              value={ad.bedrooms}
+              value={ad.bedroom}
               onChange={(e) => {
-                setAd({ ...ad, bedrooms: e.target.value });
+                setAd({ ...ad, bedroom: e.target.value });
               }}
               required
             />
@@ -218,6 +244,7 @@ const AdForm = ({ action }) => {
                       type="radio"
                       defaultChecked={type.id === "email"}
                       className="h-4 w-4"
+                      required
                       onChange={() => setAd({ ...ad, carPark: type.id })}
                     />
                     <label

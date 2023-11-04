@@ -113,6 +113,7 @@ const ImageUpload = ({ ad, setAd }) => {
                   name="file-upload"
                   type="file"
                   className="sr-only"
+                  required
                 />
               </label>
             </div>

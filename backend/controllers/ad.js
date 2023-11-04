@@ -1,5 +1,17 @@
 import S3 from "aws-sdk/clients/s3.js";
 import { nanoid } from "nanoid";
+import slugify from "slugify";
+import Ad from "../models/ad.js";
+import User from "../models/user.js";
+import NodeGeocoder from "node-geocoder";
+
+const options = {
+  provide: "google",
+  apiKey: "",
+  formatter: null,
+};
+
+const googleGeocoder = NodeGeocoder(options);
 
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -40,7 +52,7 @@ const uploadImage = (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Upload failed. Try again." });
+    res.status(500).json({ error: "Something went wrong. Try again." });
   }
 };
 
@@ -57,13 +69,76 @@ const deleteImage = (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Deletion failed. Try again." });
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
+const createAd = async (req, res) => {
+  try {
+    // console.log(req.body);
+    // return;
+    const { photos, price, address, propertyType, title } = req.body;
+
+    if (!photos?.length) {
+      return res.status(400).json({
+        error: "You must upload the photos of property you will sell.",
+      });
+    }
+    if (!price) {
+      return res
+        .status(400)
+        .json({ error: "You must enter the price of property you will sell." });
+    }
+    if (!propertyType) {
+      return res
+        .status(400)
+        .json({ error: "You must choose the type of property you will sell." });
+    }
+    if (!address) {
+      return res.status(400).json({
+        error: "You must enter the address of property you will sell.",
+      });
+    }
+    if (!title) {
+      return res.status(400).json({
+        error:
+          "You must enter the title of the ad of the property you will sell.",
+      });
+    }
+
+    const geo = await googleGeocoder.geocode(address);
+
+    const ad = await new Ad({
+      ...req.body,
+      postedBy: req.user.userId,
+      location: {
+        type: "Point",
+        coordinates: [geo?.[0]?.longitude, geo?.[0]?.latitude],
+      },
+      googleMap: geo,
+    }).save();
+
+    // user role change
+    const user = await User.findById(req.user.userId);
+    let newUser;
+    if (user.role !== "Seller") {
+      user.role = "Seller";
+      newUser = await user.save();
+    }
+    newUser.password = undefined;
+    newUser.resetCode = undefined;
+
+    res.status(200).json({ ad, newUser });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Something went wrong. Try again." });
   }
 };
 
 const adController = {
   uploadImage,
   deleteImage,
+  createAd,
 };
 
 export default adController;
