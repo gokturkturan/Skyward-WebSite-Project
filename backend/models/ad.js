@@ -11,16 +11,7 @@ const adSchema = mongoose.Schema(
     description: {}, //+
     landSize: {
       type: Number,
-      required: function () {
-        return this.propertyType === "land";
-      },
-      validate: {
-        validator: function () {
-          return this.propertyType === "land";
-        },
-        message:
-          "The landSize value can only be set if the property type is land.",
-      },
+      required: true,
     },
     bedroom: {
       type: Number,

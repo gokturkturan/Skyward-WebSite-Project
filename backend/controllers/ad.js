@@ -75,8 +75,6 @@ const deleteImage = (req, res) => {
 
 const createAd = async (req, res) => {
   try {
-    // console.log(req.body);
-    // return;
     const { photos, price, address, propertyType, title } = req.body;
 
     if (!photos?.length) {
@@ -116,15 +114,16 @@ const createAd = async (req, res) => {
         coordinates: [geo?.[0]?.longitude, geo?.[0]?.latitude],
       },
       googleMap: geo,
+      slug: slugify(`${propertyType}-${address}-${price}-${nanoid(6)}`),
     }).save();
 
     // user role change
     const user = await User.findById(req.user.userId);
-    let newUser;
     if (user.role !== "Seller") {
       user.role = "Seller";
-      newUser = await user.save();
     }
+
+    const newUser = await user.save();
     newUser.password = undefined;
     newUser.resetCode = undefined;
 
@@ -135,10 +134,29 @@ const createAd = async (req, res) => {
   }
 };
 
+const AllAds = async (req, res) => {
+  try {
+    const adsForSell = await Ad.find({ action: "sell" })
+      .select("-googleMap -location -photo.Key -photo.key -photo.ETag")
+      .sort({ createdAt: -1 })
+      .limit(12);
+
+    const adsForRent = await Ad.find({ action: "rent" })
+      .select("-googleMap -location -photo.Key -photo.key -photo.ETag")
+      .sort({ createdAt: -1 })
+      .limit(12);
+
+    res.status(200).json({ adsForSell, adsForRent });
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
 const adController = {
   uploadImage,
   deleteImage,
   createAd,
+  AllAds,
 };
 
 export default adController;

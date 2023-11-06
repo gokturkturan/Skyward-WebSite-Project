@@ -4,6 +4,7 @@ import CurrencyInput from "react-currency-input-field";
 import { GOOGLE_PLACES_KEY } from "../constants";
 import ImageUpload from "./ImageUpload";
 import axios from "axios";
+import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -36,8 +37,6 @@ const AdForm = ({ action }) => {
       delete ad.bathroom;
       delete ad.bedroom;
       delete ad.carPark;
-    } else {
-      delete ad.landSize;
     }
     setAd({ ...ad, propertyType: type.id });
   };
@@ -53,7 +52,7 @@ const AdForm = ({ action }) => {
       } else {
         toast.success("Ad created successfully");
         setAd({ ...ad, loading: false });
-        // navigate("/dashboard");
+        navigate("/dashboard");
       }
     } catch (error) {
       console.log(error);
@@ -160,6 +159,28 @@ const AdForm = ({ action }) => {
           </div>
         </div>
 
+        <div className="mt-2">
+          <label
+            htmlFor="landSize"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Land Size
+          </label>
+
+          <input
+            type="number"
+            name="landSize"
+            id="landSize"
+            min="0"
+            className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+            value={ad.landSize}
+            onChange={(e) => {
+              setAd({ ...ad, landSize: e.target.value });
+            }}
+            required
+          />
+        </div>
+
         {ad.propertyType && ad.propertyType !== "land" && (
           <div className="mt-2">
             <label
@@ -177,29 +198,6 @@ const AdForm = ({ action }) => {
               value={ad.bedroom}
               onChange={(e) => {
                 setAd({ ...ad, bedroom: e.target.value });
-              }}
-              required
-            />
-          </div>
-        )}
-
-        {ad.propertyType && ad.propertyType === "land" && (
-          <div className="mt-2">
-            <label
-              htmlFor="landSize"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Land Size
-            </label>
-            <input
-              type="number"
-              name="landSize"
-              id="landSize"
-              min="0"
-              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-              value={ad.landSize}
-              onChange={(e) => {
-                setAd({ ...ad, landSize: e.target.value });
               }}
               required
             />
@@ -285,8 +283,9 @@ const AdForm = ({ action }) => {
         <button
           type="submit"
           className="rounded-md bg-blue-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 mt-2"
+          disabled={ad.loading}
         >
-          Post Ad
+          {ad.loading ? <Loader /> : "Post Ad"}
         </button>
       </form>
     </>
