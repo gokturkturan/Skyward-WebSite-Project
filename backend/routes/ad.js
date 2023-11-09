@@ -8,6 +8,7 @@ const router = express.Router();
 router.post("/create-ad", isAuth, adController.createAd);
 router.post("/upload-image", isAuth, adController.uploadImage);
 router.post("/delete-image", isAuth, adController.deleteImage);
-router.get("/allAds", adController.AllAds);
+router.get("/allAds", adController.allAds);
+router.get("/ad/:slug", adController.singleAd);
 
 export default router;

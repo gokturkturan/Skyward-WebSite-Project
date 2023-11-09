@@ -20,6 +20,7 @@ import Dashboard from "./pages/user/Dashboard";
 import PrivateRoute from "./components/routes/PrivateRoute";
 import Sell from "./pages/user/ad/Sell";
 import Rent from "./pages/user/ad/Rent";
+import Ad from "./pages/Ad";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
         path="/account-access/:resetToken"
         element={<AccountAccess />}
       ></Route>
+      <Route path="/ad/:slug" element={<Ad />}></Route>
 
       <Route path="" element={<PrivateRoute />}>
         <Route path="/dashboard" element={<Dashboard />}></Route>

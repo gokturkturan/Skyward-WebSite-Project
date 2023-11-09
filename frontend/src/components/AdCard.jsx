@@ -1,17 +1,22 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { IoBedOutline } from "react-icons/io5";
 import { BiArea } from "react-icons/bi";
 import { TbBath } from "react-icons/tb";
+import { formatPrice } from "../helpers/formatPrice";
 
-const AdCard = ({ ad, key }) => {
-  const formatPrice = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const AdCard = ({ ad }) => {
+  const navigate = useNavigate();
+
+  const handlerClickAd = () => {
+    navigate("/ad/" + ad.slug);
   };
 
   return (
     <li
-      key={key}
+      key={ad._id}
       className="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow border"
+      onClick={handlerClickAd}
     >
       <div className="flex flex-1 flex-col p-2">
         <img
@@ -59,6 +64,10 @@ const AdCard = ({ ad, key }) => {
                   <div className="flex">
                     <TbBath />
                     <span className="-mt-1 ml-2">{ad.bathroom}</span>
+                  </div>
+                  <div className="flex">
+                    <BiArea />
+                    <span className="-mt-1 ml-2">{ad.landSize}</span>
                   </div>
                 </>
               )}

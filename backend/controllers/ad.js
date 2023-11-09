@@ -134,7 +134,7 @@ const createAd = async (req, res) => {
   }
 };
 
-const AllAds = async (req, res) => {
+const allAds = async (req, res) => {
   try {
     const adsForSell = await Ad.find({ action: "sell" })
       .select("-googleMap -location -photo.Key -photo.key -photo.ETag")
@@ -152,11 +152,39 @@ const AllAds = async (req, res) => {
   }
 };
 
+const singleAd = async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const ad = await Ad.findOne({ slug }).populate(
+      "postedBy",
+      "name username email phone company photo.Location"
+    );
+
+    const related = await Ad.find({
+      _id: { $ne: ad._id },
+      action: ad.action,
+      type: ad.type,
+      propertyType: ad.propertyType,
+      address: {
+        $regex: ad.googleMap[0].administrativeLevels.level1long,
+        $options: "i",
+      },
+    })
+      .limit(3)
+      .select("-photos.Key -photos.key -photos.ETag -photos.Bucket -googleMap");
+
+    res.status(200).json({ ad, related });
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
 const adController = {
   uploadImage,
   deleteImage,
   createAd,
-  AllAds,
+  allAds,
+  singleAd,
 };
 
 export default adController;

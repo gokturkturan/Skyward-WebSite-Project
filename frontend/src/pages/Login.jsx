@@ -22,7 +22,7 @@ const Login = () => {
     if (auth?.isLoggedin) {
       navigate(redirect);
     }
-  }, [auth, navigate]);
+  }, [auth, navigate, redirect]);
 
   const submitHandler = async (e) => {
     e.preventDefault();

@@ -24,19 +24,21 @@ const Home = () => {
   return (
     <div>
       {adsForSell?.length === 0 || (
-        <div class="text-4xl font-bold text-gray-700 mb-2">For Sell</div>
+        <div className="text-4xl font-bold text-gray-700 mb-2">For Sell</div>
       )}
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {adsForSell?.map((ad) => (
-          <AdCard ad={ad} key={ad._id} />
+          <AdCard ad={ad} />
         ))}
       </ul>
       {adsForRent?.length === 0 || (
-        <div class="text-4xl font-bold text-gray-700 mb-2 mt-8">For Rent</div>
+        <div className="text-4xl font-bold text-gray-700 mb-2 mt-8">
+          For Rent
+        </div>
       )}
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {adsForRent?.map((ad) => (
-          <AdCard ad={ad} key={ad._id} />
+          <AdCard ad={ad} />
         ))}
       </ul>
     </div>
