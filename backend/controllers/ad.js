@@ -179,12 +179,56 @@ const singleAd = async (req, res) => {
   }
 };
 
+const addToWishlist = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+
+    if (user.wishlist.includes(req.params.id)) {
+      return res
+        .status(400)
+        .json({ error: "This ad is already on your wishlist." });
+    }
+
+    user.wishlist.push(req.params.id);
+    const updatedWishlistUser = await user.save();
+    const { password, resetCode, ...rest } = updatedWishlistUser._doc;
+    res.status(200).json({ rest });
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
+const removeFromWishlist = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+
+    if (!user.wishlist.includes(req.params.id)) {
+      return res
+        .status(400)
+        .json({ error: "This ad is not already on your wihslist." });
+    }
+
+    const removeAdFromWishlist = user.wishlist.filter((id) => {
+      return id.toString() !== req.params.id;
+    });
+
+    user.wishlist = removeAdFromWishlist;
+    const updatedWishlistUser = await user.save();
+    const { password, resetCode, ...rest } = updatedWishlistUser._doc;
+    res.status(200).json({ rest });
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
 const adController = {
   uploadImage,
   deleteImage,
   createAd,
   allAds,
   singleAd,
+  addToWishlist,
+  removeFromWishlist,
 };
 
 export default adController;

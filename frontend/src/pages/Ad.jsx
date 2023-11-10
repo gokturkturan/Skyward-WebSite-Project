@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Tab } from "@headlessui/react";
 import { HeartIcon } from "@heroicons/react/24/outline";
@@ -7,11 +7,18 @@ import { IoBedOutline } from "react-icons/io5";
 import { BiArea } from "react-icons/bi";
 import { TbBath } from "react-icons/tb";
 import { formatPrice } from "../helpers/formatPrice";
+import { daysAgoFromDate } from "../helpers/daysAgoFromDate";
+import { useAuth } from "../context/auth";
+import toast from "react-hot-toast";
 
 const Ad = () => {
   const { slug } = useParams();
   const [ad, setAd] = useState("");
   const [relatedAds, setRelatedAds] = useState("");
+
+  const [auth, setAuth] = useAuth();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAd = async () => {
@@ -31,6 +38,38 @@ const Ad = () => {
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
   }
+
+  const handleUnlike = async () => {
+    try {
+      if (auth.user === null) {
+        navigate(`/login?redirect=/ad/${slug}`);
+      }
+      const { data } = await axios.delete(`/ads/wishlist/${ad._id}`);
+      const fromLS = JSON.parse(localStorage.getItem("auth"));
+      fromLS.user = data.rest;
+      localStorage.setItem("auth", JSON.stringify(fromLS));
+      setAuth({ ...auth, user: data.rest });
+      toast.success("Removed from wishlist.");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLike = async () => {
+    try {
+      if (auth.user === null) {
+        navigate(`/login?redirect=/ad/${slug}`);
+      }
+      const { data } = await axios.post(`/ads/wishlist/${ad._id}`);
+      const fromLS = JSON.parse(localStorage.getItem("auth"));
+      fromLS.user = data.rest;
+      localStorage.setItem("auth", JSON.stringify(fromLS));
+      setAuth({ ...auth, user: data.rest });
+      toast.success("Added to wishlist.");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="bg-white">
@@ -93,6 +132,14 @@ const Ad = () => {
             </div>
 
             <div className="mt-3">
+              <p className="text-lg tracking-tight text-gray-900">
+                {daysAgoFromDate(ad.createdAt) === 0
+                  ? "Posted today"
+                  : "Posted " + daysAgoFromDate(ad.createdAt) + " days ago"}
+              </p>
+            </div>
+
+            <div className="mt-3">
               <div
                 className={`inline-flex items-center rounded-lg ${
                   ad?.action === "sell"
@@ -111,7 +158,7 @@ const Ad = () => {
             </div>
 
             <div className="mt-3">
-              <p className="tracking-tight text-gray-900">
+              <div className="tracking-tight text-gray-900">
                 {ad.propertyType === "house" && (
                   <>
                     <div className="flex">
@@ -140,7 +187,7 @@ const Ad = () => {
                     </div>
                   </>
                 )}
-              </p>
+              </div>
             </div>
 
             <div className="-ml-px flex w-0 flex-1">
@@ -155,16 +202,32 @@ const Ad = () => {
             </div>
 
             <div className="mt-3 flex">
-              <button
-                type="button"
-                className="flex items-center justify-center rounded-md px-1 py-1 text-red-600 hover:text-red-900
+              {auth?.user?.wishlist?.includes(ad._id) ? (
+                <button
+                  type="button"
+                  className="flex items-center justify-center rounded-md px-1 py-1 text-red-600 hover:text-red-900
                 hover:bg-gray-100"
-              >
-                <HeartIcon
-                  className="h-6 w-6 flex-shrink-0"
-                  aria-hidden="true"
-                />
-              </button>
+                  onClick={handleUnlike}
+                >
+                  <HeartIcon
+                    className="h-6 w-6 flex-shrink-0"
+                    aria-hidden="true"
+                    fill="red"
+                  />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="flex items-center justify-center rounded-md px-1 py-1 text-red-600 hover:text-red-900
+                hover:bg-gray-100"
+                  onClick={handleLike}
+                >
+                  <HeartIcon
+                    className="h-6 w-6 flex-shrink-0"
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
             </div>
           </div>
         </div>
