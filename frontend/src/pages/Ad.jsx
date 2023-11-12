@@ -10,6 +10,8 @@ import { formatPrice } from "../helpers/formatPrice";
 import { daysAgoFromDate } from "../helpers/daysAgoFromDate";
 import { useAuth } from "../context/auth";
 import toast from "react-hot-toast";
+import Map from "../components/Map";
+import AdCard from "../components/AdCard";
 
 const Ad = () => {
   const { slug } = useParams();
@@ -51,6 +53,7 @@ const Ad = () => {
       setAuth({ ...auth, user: data.rest });
       toast.success("Removed from wishlist.");
     } catch (error) {
+      toast.error(error);
       console.log(error);
     }
   };
@@ -67,6 +70,7 @@ const Ad = () => {
       setAuth({ ...auth, user: data.rest });
       toast.success("Added to wishlist.");
     } catch (error) {
+      toast.error(error);
       console.log(error);
     }
   };
@@ -229,6 +233,16 @@ const Ad = () => {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+        <Map ad={ad} />
+        <div className="inset-0 flex items-center mt-5">
+          <div className="w-full border-t border-gray-300" />
+        </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-5">
+          <div>
+            <div className=" text-2xl font-bold mb-2">Similar Ads</div>
+            {relatedAds && relatedAds.map((ad) => <AdCard ad={ad} />)}
           </div>
         </div>
       </div>
