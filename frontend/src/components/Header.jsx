@@ -164,6 +164,19 @@ const Header = () => {
                           <Menu.Item>
                             {({ active }) => (
                               <Link
+                                to="/profile"
+                                className={classNames(
+                                  active ? "bg-gray-100" : "",
+                                  "block px-4 py-2 text-sm text-gray-700"
+                                )}
+                              >
+                                Profile
+                              </Link>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <Link
                                 to="/dashboard"
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
@@ -256,6 +269,11 @@ const Header = () => {
                 </Disclosure>
                 {auth.isLoggedin && (
                   <>
+                    <Link to="/profile">
+                      <Disclosure.Button className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">
+                        Profile
+                      </Disclosure.Button>
+                    </Link>
                     <Link to="/dashboard">
                       <Disclosure.Button className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">
                         Dashboard

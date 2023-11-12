@@ -14,6 +14,11 @@ const userSchema = mongoose.Schema(
       trim: true,
       default: "",
     },
+    about: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     email: {
       type: String,
       required: true,

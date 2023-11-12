@@ -34,4 +34,25 @@ const isPasswordValid = (req, res, next) => {
   next();
 };
 
-export { isEmailValid, isPasswordValid };
+const checkNewPassword = (req, res, next) => {
+  const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+  if (oldPassword && newPassword && confirmNewPassword) {
+    if (newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "New password should be at least 6 chatacters." });
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).json({
+        error: "New Password and Confirm Passwords are not the same.",
+      });
+    }
+  } else {
+    return res.status(400).json({ error: "Please fill the passwords boxes." });
+  }
+  next();
+};
+
+export { isEmailValid, isPasswordValid, checkNewPassword };

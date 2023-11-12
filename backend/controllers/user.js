@@ -1,4 +1,5 @@
 import SES from "aws-sdk/clients/ses.js";
+import S3 from "aws-sdk/clients/s3.js";
 import jwt from "jsonwebtoken";
 import emailTemplate from "../helpers/email.js";
 import User from "../models/user.js";
@@ -13,6 +14,7 @@ const awsConfig = {
 };
 
 const awsSes = new SES(awsConfig);
+const awsS3 = new S3(awsConfig);
 
 const tokenAndUserResponse = (req, res, user) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -210,7 +212,7 @@ const getProfile = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   try {
-    const { password } = req.body;
+    const { oldPassword, newPassword } = req.body;
 
     const user = await User.findById(req.user.userId);
 
@@ -218,7 +220,16 @@ const updatePassword = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    user.password = await hashPassword(password);
+    const isOldPasswordCorrect = await comparePasswords(
+      oldPassword,
+      user.password
+    );
+
+    if (!isOldPasswordCorrect) {
+      return res.status(400).json({ error: "Old Password is wrong." });
+    }
+
+    user.password = await hashPassword(newPassword);
     await user.save();
     return res.status(200).json({ message: "Password is updated." });
   } catch (error) {
@@ -228,13 +239,20 @@ const updatePassword = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user.userId,
-      req.body,
-      {
-        new: true,
-      }
-    );
+    const user = await User.findById(req.user.userId);
+
+    user.username = req.body.username;
+    user.name = req.body.name;
+    user.company = req.body.company;
+    user.phone = req.body.phone;
+    user.about = req.body.about;
+    user.photo = req.body.photo;
+    user.homeAddress.address = req.body.address;
+    user.homeAddress.city = req.body.city;
+    user.homeAddress.postalCode = req.body.postalCode;
+    user.homeAddress.country = req.body.country;
+
+    const updatedUser = await user.save();
 
     updatedUser.password = undefined;
     updatedUser.resetCode = undefined;
@@ -253,6 +271,57 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const uploadImage = async (req, res) => {
+  try {
+    const { image } = req.body;
+
+    const base64Image = new Buffer.from(
+      image.replace(/^data:image\/\w+;base64,/, ""),
+      "base64"
+    );
+
+    const type = image.split(";")[0].split("/")[1];
+
+    const params = {
+      Bucket: "skywards3",
+      Key: `${nanoid()}.${type}`,
+      Body: base64Image,
+      ACL: "public-read",
+      ContentEncoding: "base64",
+      ContentType: `image/${type}`,
+    };
+
+    awsS3.upload(params, (err, data) => {
+      if (err) {
+        console.log(err);
+        res.status(400).json({ error: "Upload failed. Try again." });
+      } else {
+        res.status(200).json(data);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
+const deleteImage = async (req, res) => {
+  try {
+    const { Key, Bucket } = req.body;
+    awsS3.deleteObject({ Bucket, Key }, (err, data) => {
+      if (err) {
+        console.log(err);
+        res.status(400).json({ error: "Deletion failed. Try again." });
+      } else {
+        res.status(200).json({ message: "Deletion successful." });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
 const userController = {
   preRegister,
   register,
@@ -264,6 +333,8 @@ const userController = {
   getProfile,
   updatePassword,
   updateProfile,
+  uploadImage,
+  deleteImage,
 };
 
 export default userController;

@@ -21,6 +21,7 @@ import PrivateRoute from "./components/routes/PrivateRoute";
 import Sell from "./pages/user/ad/Sell";
 import Rent from "./pages/user/ad/Rent";
 import Ad from "./pages/Ad";
+import Profile from "./pages/Profile";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,6 +44,7 @@ const router = createBrowserRouter(
         <Route path="/dashboard" element={<Dashboard />}></Route>
         <Route path="/ad/create/sell" element={<Sell />}></Route>
         <Route path="/ad/create/rent" element={<Rent />}></Route>
+        <Route path="/profile/" element={<Profile />}></Route>
       </Route>
     </Route>
   )
