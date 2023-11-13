@@ -12,6 +12,7 @@ import { useAuth } from "../context/auth";
 import toast from "react-hot-toast";
 import Map from "../components/Map";
 import AdCard from "../components/AdCard";
+import ContactSeller from "../components/ContactSeller";
 
 const Ad = () => {
   const { slug } = useParams();
@@ -194,10 +195,6 @@ const Ad = () => {
               </div>
             </div>
 
-            <div className="-ml-px flex w-0 flex-1">
-              <div className="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900"></div>
-            </div>
-
             <div className="mt-3">
               <div
                 className="space-y-6 text-base text-gray-700"
@@ -233,6 +230,7 @@ const Ad = () => {
                 </button>
               )}
             </div>
+            <ContactSeller ad={ad} />
           </div>
         </div>
         <Map ad={ad} />

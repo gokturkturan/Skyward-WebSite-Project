@@ -1,9 +1,11 @@
 import S3 from "aws-sdk/clients/s3.js";
+import SES from "aws-sdk/clients/ses.js";
 import { nanoid } from "nanoid";
 import slugify from "slugify";
 import Ad from "../models/ad.js";
 import User from "../models/user.js";
 import NodeGeocoder from "node-geocoder";
+import emailTemplate from "../helpers/email.js";
 
 const options = {
   provide: "google",
@@ -21,6 +23,7 @@ const awsConfig = {
 };
 
 const awsS3 = new S3(awsConfig);
+const awsSes = new SES(awsConfig);
 
 const uploadImage = (req, res) => {
   try {
@@ -221,6 +224,60 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
+const contactSeller = async (req, res) => {
+  try {
+    const { name, email, phone, message, adId } = req.body;
+
+    if (!message || !name || !email || !phone) {
+      return res.status(400).json({ error: "Please fill the form." });
+    }
+
+    const ad = await Ad.findById(adId).populate("postedBy", "email");
+    if (!ad) {
+      return res.status(400).json({ error: "This ad was not found." });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(400).json({ error: "User was not found." });
+    }
+
+    if (user.searchedProperties.includes(adId)) {
+      return res
+        .status(400)
+        .json({ error: "A message has already been sent to this ad." });
+    }
+
+    user.searchedProperties.push(adId);
+    await user.save();
+
+    awsSes.sendEmail(
+      emailTemplate(
+        ad.postedBy.email,
+        `<p>You have received a new customer message</p>
+        <h4>Customer Details</h4>
+        <p>Name: ${name}</p>
+        <p>Email: ${email}</p>
+        <p>Phone: ${phone}</p>
+        <p>Message: ${message}</p>
+    <a href="${process.env.CLIENT_URL}/ad/${ad.slug}"}>${ad.propertyType} in ${ad.address} for ${ad.action} ${ad.price}</a>`,
+        email,
+        `New Message Received`
+      ),
+      (err, data) => {
+        if (err) {
+          console.log(err);
+          return res.status(400).json({ error: "Mail sending failed." });
+        } else {
+          return res.status(200).json({ message: "Mail sending successful." });
+        }
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
 const adController = {
   uploadImage,
   deleteImage,
@@ -229,6 +286,7 @@ const adController = {
   singleAd,
   addToWishlist,
   removeFromWishlist,
+  contactSeller,
 };
 
 export default adController;
