@@ -5,11 +5,12 @@ import { BiArea } from "react-icons/bi";
 import { TbBath } from "react-icons/tb";
 import { formatPrice } from "../helpers/formatPrice";
 
-const AdCard = ({ ad }) => {
+const AdCard = ({ ad, userAd = false }) => {
   const navigate = useNavigate();
 
   const handlerClickAd = () => {
-    navigate("/ad/" + ad.slug);
+    if (userAd) navigate("/user/ad/" + ad.slug);
+    else navigate("/ad/" + ad.slug);
   };
 
   return (
@@ -21,7 +22,7 @@ const AdCard = ({ ad }) => {
       <div className="flex flex-1 flex-col p-2">
         <img
           className="mx-auto h-56 w-64 flex-shrink-0 rounded-md"
-          src={ad.photos[0].Location}
+          src={ad.photos[0]?.Location}
           alt=""
         />
         <dd className="mt-2">

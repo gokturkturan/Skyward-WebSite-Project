@@ -13,5 +13,7 @@ router.get("/ad/:slug", adController.singleAd);
 router.post("/wishlist/:id", isAuth, adController.addToWishlist);
 router.delete("/wishlist/:id", isAuth, adController.removeFromWishlist);
 router.post("/contact-seller", isAuth, adController.contactSeller);
+router.get("/user-ads/:page", isAuth, adController.userAds);
+router.put("/ad/:id", isAuth, adController.editAd);
 
 export default router;

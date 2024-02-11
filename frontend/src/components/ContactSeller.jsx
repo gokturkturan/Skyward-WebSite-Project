@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, Link, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/auth";
 import toast from "react-hot-toast";
 import axios from "axios";

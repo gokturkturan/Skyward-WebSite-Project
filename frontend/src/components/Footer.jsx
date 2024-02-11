@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Example() {
+export default function Footer() {
   return (
     <footer className="bg-blue-500">
       <div className="mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-12 lg:px-8">

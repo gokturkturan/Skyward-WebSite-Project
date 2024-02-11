@@ -278,6 +278,52 @@ const contactSeller = async (req, res) => {
   }
 };
 
+const userAds = async (req, res) => {
+  try {
+    const perPage = 2;
+    const page = req.params.page ? req.params.page : 1;
+
+    const total = await Ad.find({ postedBy: req.user.userId });
+
+    const ads = await Ad.find({ postedBy: req.user.userId })
+      .populate("postedBy", "name email username phone company")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ createdAt: -1 });
+
+    res.json({ ads, total: total.length });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const editAd = async (req, res) => {
+  try {
+    const { photos, price, address, propertyType, title } = req.body;
+
+    const ad = await Ad.findById(req.params.id);
+
+    const owner = req.user.userId == ad?.postedBy;
+
+    if (!owner) return res.json({ error: "Permission denied" });
+
+    const geo = await googleGeocoder.geocode(address);
+
+    const updatedAd = await Ad.findByIdAndUpdate(req.params.id, {
+      ...req.body,
+      slug: slugify(`${propertyType}-${address}-${price}-${nanoid(6)}`),
+      location: {
+        type: "Point",
+        coordinates: [geo[0].longitude, geo[0].latitude],
+      },
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const adController = {
   uploadImage,
   deleteImage,
@@ -287,6 +333,8 @@ const adController = {
   addToWishlist,
   removeFromWishlist,
   contactSeller,
+  userAds,
+  editAd,
 };
 
 export default adController;

@@ -22,6 +22,7 @@ import Sell from "./pages/user/ad/Sell";
 import Rent from "./pages/user/ad/Rent";
 import Ad from "./pages/Ad";
 import Profile from "./pages/Profile";
+import Edit from "./pages/user/ad/Edit";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -44,6 +45,7 @@ const router = createBrowserRouter(
         <Route path="/dashboard" element={<Dashboard />}></Route>
         <Route path="/ad/create/sell" element={<Sell />}></Route>
         <Route path="/ad/create/rent" element={<Rent />}></Route>
+        <Route path="/user/ad/:slug" element={<Edit />}></Route>
         <Route path="/profile/" element={<Profile />}></Route>
       </Route>
     </Route>
