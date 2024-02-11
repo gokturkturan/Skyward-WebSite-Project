@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { IoBedOutline } from "react-icons/io5";
 import { BiArea } from "react-icons/bi";
 import { TbBath } from "react-icons/tb";
+import { FaRegTrashAlt } from "react-icons/fa";
 import { formatPrice } from "../helpers/formatPrice";
+import axios from "axios";
+import toast from "react-hot-toast";
 
-const AdCard = ({ ad, userAd = false }) => {
+const AdCard = ({ ad, userAd = false, onDelete }) => {
   const navigate = useNavigate();
 
   const handlerClickAd = () => {
@@ -13,13 +16,39 @@ const AdCard = ({ ad, userAd = false }) => {
     else navigate("/ad/" + ad.slug);
   };
 
+  const deleteAd = async (adId) => {
+    try {
+      const { data } = await axios.delete(`/ads/delete/${adId}`);
+      if (data?.error) {
+        toast.error(data.error);
+      } else {
+        toast.success("Ad deleted successfully.");
+        onDelete();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <li
       key={ad._id}
       className="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow border"
-      onClick={handlerClickAd}
     >
-      <div className="flex flex-1 flex-col p-2">
+      <div className="flex justify-center">
+        {userAd && (
+          <button
+            className="text-red-600 mb-2 mt-2"
+            onClick={() => deleteAd(ad._id)}
+          >
+            <FaRegTrashAlt />
+          </button>
+        )}
+      </div>
+      <div
+        className="flex flex-1 flex-col p-2 cursor-pointer"
+        onClick={handlerClickAd}
+      >
         <img
           className="mx-auto h-56 w-64 flex-shrink-0 rounded-md"
           src={ad.photos[0]?.Location}

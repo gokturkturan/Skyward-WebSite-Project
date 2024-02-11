@@ -185,12 +185,17 @@ const singleAd = async (req, res) => {
 const addToWishlist = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
+    const ad = await Ad.findById(req.params.id);
 
-    if (user.wishlist.includes(req.params.id)) {
+    if (ad.postedBy.toString() === req.user.userId)
+      return res.status(400).json({
+        error: "This ad posted by you.",
+      });
+
+    if (user.wishlist.includes(req.params.id))
       return res
         .status(400)
         .json({ error: "This ad is already on your wishlist." });
-    }
 
     user.wishlist.push(req.params.id);
     const updatedWishlistUser = await user.save();
@@ -236,6 +241,11 @@ const contactSeller = async (req, res) => {
     if (!ad) {
       return res.status(400).json({ error: "This ad was not found." });
     }
+
+    if (ad.postedBy._id.toString() === req.user.userId)
+      return res.status(400).json({
+        error: "This ad posted by you.",
+      });
 
     const user = await User.findById(req.user.userId);
     if (!user) {
@@ -291,7 +301,7 @@ const userAds = async (req, res) => {
       .limit(perPage)
       .sort({ createdAt: -1 });
 
-    res.json({ ads, total: total.length });
+    res.status(200).json({ ads, total: total.length });
   } catch (err) {
     console.log(err);
   }
@@ -305,7 +315,7 @@ const editAd = async (req, res) => {
 
     const owner = req.user.userId == ad?.postedBy;
 
-    if (!owner) return res.json({ error: "Permission denied" });
+    if (!owner) return res.status(400).json({ error: "Permission denied" });
 
     const geo = await googleGeocoder.geocode(address);
 
@@ -318,7 +328,46 @@ const editAd = async (req, res) => {
       },
     });
 
-    res.json({ ok: true });
+    res.status(200).json({ ok: true });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const enquiredProperties = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    const ads = await Ad.find({ _id: user.searchedProperties }).sort({
+      createAd: -1,
+    });
+    res.status(200).json({ ads });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const wishlist = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    const ads = await Ad.find({ _id: user.wishlist }).sort({
+      createAd: -1,
+    });
+    res.status(200).json({ ads });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const deleteAd = async (req, res) => {
+  try {
+    const ad = await Ad.findById(req.params.id);
+    if (!ad) return res.status(400).json({ error: "This ad was not found." });
+
+    const owner = req.user.userId === ad.postedBy;
+    if (owner) return res.status(400).json({ error: "Permission denied." });
+
+    await ad.deleteOne();
+    res.status(200).json({ message: "Ad deleted successfully." });
   } catch (err) {
     console.log(err);
   }
@@ -335,6 +384,9 @@ const adController = {
   contactSeller,
   userAds,
   editAd,
+  enquiredProperties,
+  wishlist,
+  deleteAd,
 };
 
 export default adController;

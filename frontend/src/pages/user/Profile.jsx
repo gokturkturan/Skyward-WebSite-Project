@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/auth";
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
-import Loader from "../components/Loader";
-import ProfileImageUpload from "../components/ProfileImageUpload";
+import { useAuth } from "../../context/auth";
+import Loader from "../../components/Loader";
+import ProfileImageUpload from "../../components/ProfileImageUpload";
 
 const Profile = () => {
   const [auth, setAuth] = useAuth();
-
-  console.log(auth);
 
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
@@ -25,8 +21,6 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [uploading, setUploading] = useState(false);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (auth.user) {

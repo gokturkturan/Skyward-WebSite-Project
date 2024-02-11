@@ -189,6 +189,32 @@ const Header = () => {
                           </Menu.Item>
                           <Menu.Item>
                             {({ active }) => (
+                              <Link
+                                to="/wishlist"
+                                className={classNames(
+                                  active ? "bg-gray-100" : "",
+                                  "block px-4 py-2 text-sm text-gray-700"
+                                )}
+                              >
+                                Wishlist
+                              </Link>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <Link
+                                to="/enquiries"
+                                className={classNames(
+                                  active ? "bg-gray-100" : "",
+                                  "block px-4 py-2 text-sm text-gray-700"
+                                )}
+                              >
+                                Enquiries
+                              </Link>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
                               <div
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
@@ -277,6 +303,16 @@ const Header = () => {
                     <Link to="/dashboard">
                       <Disclosure.Button className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">
                         Dashboard
+                      </Disclosure.Button>
+                    </Link>
+                    <Link to="/wishlist">
+                      <Disclosure.Button className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">
+                        Wishlist
+                      </Disclosure.Button>
+                    </Link>
+                    <Link to="/enquiries">
+                      <Disclosure.Button className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:px-6">
+                        Enquiries
                       </Disclosure.Button>
                     </Link>
                     <Disclosure.Button

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import CurrencyInput from "react-currency-input-field";
-import { GOOGLE_PLACES_KEY } from "../../../constants";
-import ImageUpload from "../../../components/ImageUpload";
+import { GOOGLE_PLACES_KEY } from "../../constants";
+import ImageUpload from "../../components/ImageUpload";
 import axios from "axios";
-import Loader from "../../../components/Loader";
+import Loader from "../../components/Loader";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 

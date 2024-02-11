@@ -15,5 +15,8 @@ router.delete("/wishlist/:id", isAuth, adController.removeFromWishlist);
 router.post("/contact-seller", isAuth, adController.contactSeller);
 router.get("/user-ads/:page", isAuth, adController.userAds);
 router.put("/ad/:id", isAuth, adController.editAd);
+router.get("/enquiries", isAuth, adController.enquiredProperties);
+router.get("/wishlist", isAuth, adController.wishlist);
+router.delete("/delete/:id", isAuth, adController.deleteAd);
 
 export default router;

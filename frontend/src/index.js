@@ -18,11 +18,13 @@ import ForgotPassword from "./pages/ForgotPassword";
 import AccountAccess from "./pages/auth/AccountAccess";
 import Dashboard from "./pages/user/Dashboard";
 import PrivateRoute from "./components/routes/PrivateRoute";
-import Sell from "./pages/user/ad/Sell";
-import Rent from "./pages/user/ad/Rent";
-import Ad from "./pages/Ad";
-import Profile from "./pages/Profile";
-import Edit from "./pages/user/ad/Edit";
+import Sell from "./pages/ad/Sell";
+import Rent from "./pages/ad/Rent";
+import Ad from "./pages/ad/Ad";
+import Profile from "./pages/user/Profile";
+import Edit from "./pages/ad/Edit";
+import Wishlist from "./pages/user/Wishlist";
+import Enquiries from "./pages/user/Enquiries";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -47,6 +49,8 @@ const router = createBrowserRouter(
         <Route path="/ad/create/rent" element={<Rent />}></Route>
         <Route path="/user/ad/:slug" element={<Edit />}></Route>
         <Route path="/profile/" element={<Profile />}></Route>
+        <Route path="/wishlist/" element={<Wishlist />}></Route>
+        <Route path="/enquiries/" element={<Enquiries />}></Route>
       </Route>
     </Route>
   )

@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/auth";
 import axios from "axios";
 import { Tab } from "@headlessui/react";
 import { HeartIcon } from "@heroicons/react/24/outline";
 import { IoBedOutline } from "react-icons/io5";
 import { BiArea } from "react-icons/bi";
 import { TbBath } from "react-icons/tb";
-import { formatPrice } from "../helpers/formatPrice";
-import { daysAgoFromDate } from "../helpers/daysAgoFromDate";
-import { useAuth } from "../context/auth";
+import { formatPrice } from "../../helpers/formatPrice";
+import { daysAgoFromDate } from "../../helpers/daysAgoFromDate";
 import toast from "react-hot-toast";
-import Map from "../components/Map";
-import AdCard from "../components/AdCard";
-import ContactSeller from "../components/ContactSeller";
+import Map from "../../components/Map";
+import AdCard from "../../components/AdCard";
+import ContactSeller from "../../components/ContactSeller";
 
 const Ad = () => {
   const { slug } = useParams();
@@ -54,7 +54,7 @@ const Ad = () => {
       setAuth({ ...auth, user: data.rest });
       toast.success("Removed from wishlist.");
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.error);
       console.log(error);
     }
   };
@@ -71,7 +71,7 @@ const Ad = () => {
       setAuth({ ...auth, user: data.rest });
       toast.success("Added to wishlist.");
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.error);
       console.log(error);
     }
   };
@@ -124,7 +124,6 @@ const Ad = () => {
             </Tab.Panels>
           </Tab.Group>
 
-          {/* Product info */}
           <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">
               {ad.title}{" "}
@@ -243,6 +242,7 @@ const Ad = () => {
             {relatedAds && relatedAds.map((ad) => <AdCard ad={ad} />)}
           </div>
         </div>
+        {relatedAds.length === 0 && "No ad similar to this ad was found."}
       </div>
     </div>
   );

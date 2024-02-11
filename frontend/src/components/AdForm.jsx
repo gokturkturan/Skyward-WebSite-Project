@@ -7,6 +7,7 @@ import axios from "axios";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/auth";
 
 const propertyType = [
   { id: "land", title: "Land" },
@@ -20,6 +21,7 @@ const carPark = [
 
 const AdForm = ({ action }) => {
   const navigate = useNavigate();
+  const [auth, setAuth] = useAuth();
   const [ad, setAd] = useState({
     photos: [],
     uploading: false,
@@ -51,6 +53,10 @@ const AdForm = ({ action }) => {
         setAd({ ...ad, loading: false });
       } else {
         toast.success("Ad created successfully");
+        const fromLS = JSON.parse(localStorage.getItem("auth"));
+        fromLS.user = data.newUser;
+        localStorage.setItem("auth", JSON.stringify(fromLS));
+        setAuth({ ...auth, user: data.newUser });
         setAd({ ...ad, loading: false });
         navigate("/dashboard");
       }

@@ -1,5 +1,5 @@
 import React from "react";
-import AdForm from "../../../components/AdForm";
+import AdForm from "../../components/AdForm";
 
 const Sell = () => {
   return (
