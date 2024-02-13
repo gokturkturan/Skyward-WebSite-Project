@@ -75,7 +75,7 @@ const Edit = ({ action }) => {
     if (slug) {
       fetchAd();
     }
-  }, [slug]);
+  }, []);
 
   return (
     <>

@@ -9,7 +9,7 @@ const Enquiries = () => {
     const loadMore = async () => {
       try {
         const { data } = await axios.get(`/ads/enquiries`);
-        setAds([...ads, ...data.ads]);
+        setAds(data.ads);
       } catch (error) {
         console.log(error);
       }

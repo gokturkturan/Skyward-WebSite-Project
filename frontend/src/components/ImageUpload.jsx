@@ -17,6 +17,7 @@ const ImageUpload = ({ ad, setAd }) => {
                 ? "One of the photos is too large."
                 : "The size of this photo is too large."
             );
+            setAd({ ...ad, uploading: false });
           } else {
             new Promise(() => {
               Resizer.imageFileResizer(

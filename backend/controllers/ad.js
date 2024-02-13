@@ -290,18 +290,11 @@ const contactSeller = async (req, res) => {
 
 const userAds = async (req, res) => {
   try {
-    const perPage = 2;
-    const page = req.params.page ? req.params.page : 1;
-
-    const total = await Ad.find({ postedBy: req.user.userId });
-
     const ads = await Ad.find({ postedBy: req.user.userId })
       .populate("postedBy", "name email username phone company")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
       .sort({ createdAt: -1 });
 
-    res.status(200).json({ ads, total: total.length });
+    res.status(200).json({ ads });
   } catch (err) {
     console.log(err);
   }
@@ -373,6 +366,40 @@ const deleteAd = async (req, res) => {
   }
 };
 
+const search = async (req, res) => {
+  try {
+    const { action, address, type, priceRange } = req.query;
+
+    const geo = await googleGeocoder.geocode(address);
+    const ads = await Ad.find({
+      action: action === "Buy" ? "sell" : "rent",
+      propertyType: type.toLowerCase(),
+      price: {
+        $gte: parseInt(priceRange[0]),
+        $lte: parseInt(priceRange[1]),
+      },
+      location: {
+        $near: {
+          $maxDistance: 30000,
+          $geometry: {
+            type: "Point",
+            coordinates: [geo?.[0].longitude, geo?.[0].latitude],
+          },
+        },
+      },
+    })
+      .limit(24)
+      .sort({ createAd: -1 })
+      .select(
+        "-photos.Key -photos.key -photos.ETag -photos.Bucket -location -googleMap"
+      );
+
+    res.status(200).json(ads);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const adController = {
   uploadImage,
   deleteImage,
@@ -387,6 +414,7 @@ const adController = {
   enquiredProperties,
   wishlist,
   deleteAd,
+  search,
 };
 
 export default adController;

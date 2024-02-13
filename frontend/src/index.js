@@ -25,11 +25,14 @@ import Profile from "./pages/user/Profile";
 import Edit from "./pages/ad/Edit";
 import Wishlist from "./pages/user/Wishlist";
 import Enquiries from "./pages/user/Enquiries";
+import { SearchProvider } from "./context/search";
+import SearchPage from "./pages/ad/Search";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       <Route index={true} path="/" element={<Home />}></Route>
+      <Route path="/search" element={<SearchPage />}></Route>
       <Route path="/login" element={<Login />}></Route>
       <Route path="/register" element={<Register />}></Route>
       <Route
@@ -60,7 +63,9 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
   <AuthProvider>
-    <RouterProvider router={router} />
+    <SearchProvider>
+      <RouterProvider router={router} />
+    </SearchProvider>
   </AuthProvider>
   // </React.StrictMode>
 );

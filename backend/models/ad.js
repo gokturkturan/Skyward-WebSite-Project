@@ -73,5 +73,6 @@ const adSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+adSchema.index({ location: "2dsphere" });
 const Ad = mongoose.model("Ad", adSchema);
 export default Ad;

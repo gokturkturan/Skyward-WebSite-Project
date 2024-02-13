@@ -13,10 +13,11 @@ router.get("/ad/:slug", adController.singleAd);
 router.post("/wishlist/:id", isAuth, adController.addToWishlist);
 router.delete("/wishlist/:id", isAuth, adController.removeFromWishlist);
 router.post("/contact-seller", isAuth, adController.contactSeller);
-router.get("/user-ads/:page", isAuth, adController.userAds);
+router.get("/user-ads", isAuth, adController.userAds);
 router.put("/ad/:id", isAuth, adController.editAd);
 router.get("/enquiries", isAuth, adController.enquiredProperties);
 router.get("/wishlist", isAuth, adController.wishlist);
 router.delete("/delete/:id", isAuth, adController.deleteAd);
+router.get("/search", adController.search);
 
 export default router;

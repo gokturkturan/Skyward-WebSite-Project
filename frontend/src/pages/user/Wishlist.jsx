@@ -9,7 +9,7 @@ const Wishlist = () => {
     const loadMore = async () => {
       try {
         const { data } = await axios.get(`/ads/wishlist`);
-        setAds([...ads, ...data.ads]);
+        setAds(data.ads);
       } catch (error) {
         console.log(error);
       }
